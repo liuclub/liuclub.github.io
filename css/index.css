@@ -175,6 +175,8 @@ table td {
   color: #eff;
   font-size: 14px;
   line-height: 20px;
+  counter-reset: line;
+  white-space: pre-wrap;
 }
 figure.highlight {
   position: relative;
@@ -223,6 +225,15 @@ blockquote {
 .article-container .highlight .line::selection {
   background: rgba(128,203,196,0.125);
   color: #eff;
+}
+.article-container .highlight .line:before {
+  display: inline-block;
+  padding: 0 0.3rem 0 0;
+  min-width: 1.6rem;
+  color: #37474f;
+  content: counter(line);
+  counter-increment: line;
+  text-align: left;
 }
 .article-container .highlight table {
   position: relative;
@@ -547,7 +558,7 @@ footer.is-mobile {
   -webkit-align-items: center;
   align-items: center;
   padding: 0 1rem;
-  height: 60vh;
+  height: 100vh;
 }
 #site-title,
 #site-sub-title {
@@ -1173,7 +1184,7 @@ footer.is-mobile {
   align-items: center;
   padding: 0 1rem;
   width: 100%;
-  height: 60vh;
+  height: 100vh;
   color: #eee;
   text-align: center;
 }
