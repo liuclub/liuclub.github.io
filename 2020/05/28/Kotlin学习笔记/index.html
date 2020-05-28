@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="[&quot;zh-tw&quot;,&quot;en&quot;,&quot;default&quot;]"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="Kotlin学习笔记"><meta name="keywords" content=""><meta name="author" content="liubo"><meta name="copyright" content="liubo"><title>Kotlin学习笔记 | 凌晨三点的逗你玩</title><link rel="shortcut icon" href="/melody-favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.7.0"><meta name="format-detection" content="telephone=no"><meta http-equiv="x-dns-prefetch-control" content="on"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  }
+} </script><meta name="generator" content="Hexo 4.2.1"></head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar" data-display="true"><div class="toggle-sidebar-info text-center"><span data-toggle="Toggle article">Toggle site</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">Catalog</div><div class="sidebar-toc__progress"><span class="progress-notice">You've read</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-6"><a class="toc-link" href="#为什么选择Kotlin？"><span class="toc-number">1.</span> <span class="toc-text">为什么选择Kotlin？</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#可变长参数函数"><span class="toc-number">2.</span> <span class="toc-text">可变长参数函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#定义常量与变量"><span class="toc-number">3.</span> <span class="toc-text">定义常量与变量</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#字符串模板"><span class="toc-number">4.</span> <span class="toc-text">字符串模板</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#NULL检查机制"><span class="toc-number">5.</span> <span class="toc-text">NULL检查机制</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#类型检测以及自动类型转换"><span class="toc-number">6.</span> <span class="toc-text">类型检测以及自动类型转换</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Kotlin基本数据类型"><span class="toc-number"></span> <span class="toc-text">Kotlin基本数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#字面常量"><span class="toc-number">1.</span> <span class="toc-text">字面常量</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#比较两个数字"><span class="toc-number">2.</span> <span class="toc-text">比较两个数字</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">liubo</div><div class="author-info__description text-center">人最大的问题就是习惯自我辩解，但我们远比自己想象中更许巍、下作和幽暗。</div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">Articles</span><span class="pull-right">14</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">Categories</span><span class="pull-right">2</span></a></div></div></div><div id="content-outer"><div class="no-bg" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">凌晨三点的逗你玩</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus">   <a class="site-page" href="/">Home</a><a class="site-page" href="/archives">Archives</a><a class="site-page" href="/tags">Tags</a><a class="site-page" href="/categories">Categories</a></span><span class="pull-right"></span></div><div id="post-info"><div id="post-title">Kotlin学习笔记</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2020-05-28</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/Kotlin/">Kotlin</a></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h6 id="为什么选择Kotlin？"><a href="#为什么选择Kotlin？" class="headerlink" title="为什么选择Kotlin？"></a>为什么选择Kotlin？</h6><ul>
+<li><p>简洁：大大减少样板代码的数量；</p>
+</li>
+<li><p>安全：避免空指针异常等整个类的错误；</p>
+</li>
+<li><p>互操作性：充分利用JVM、Android和浏览器的现有库；</p>
+</li>
+<li><p>工具友好：可用任何Java IDE或者命令行构建；</p>
+</li>
+</ul>
+<h6 id="可变长参数函数"><a href="#可变长参数函数" class="headerlink" title="可变长参数函数"></a>可变长参数函数</h6><blockquote>
+<p>函数的可变长参数可以用 <strong>vararg</strong> 关键字进行标识</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">vars</span><span class="params">(<span class="keyword">vararg</span> params : <span class="type">Int</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(element int params)&#123;</span><br><span class="line">        println(<span class="string">"element = "</span>+element)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">(args:<span class="type">Array</span>&lt;<span class="type">String</span>&gt;)</span></span>&#123;</span><br><span class="line">    vars(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="定义常量与变量"><a href="#定义常量与变量" class="headerlink" title="定义常量与变量"></a>定义常量与变量</h6><ol>
+<li>变量定义</li>
+</ol>
+<blockquote>
+<p>​        <strong>var</strong> &lt;标识符&gt; : &lt;类型&gt; = &lt;初始化值&gt;</p>
+</blockquote>
+<ol start="2">
+<li>常量定义</li>
+</ol>
+<blockquote>
+<p>​        <strong>val</strong> &lt;标识符&gt; : &lt;类型&gt; = &lt;初始化值&gt;</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a: <span class="built_in">Int</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> b = <span class="number">1</span>       <span class="comment">// 系统自动推断变量类型为Int</span></span><br><span class="line"><span class="keyword">val</span> c: <span class="built_in">Int</span>      <span class="comment">// 如果不在声明时初始化则必须提供变量类型</span></span><br><span class="line">c = <span class="number">1</span>           <span class="comment">// 明确赋值</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> x = <span class="number">5</span>        <span class="comment">// 系统自动推断变量类型为Int</span></span><br><span class="line">x += <span class="number">1</span>           <span class="comment">// 变量可修改</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="字符串模板"><a href="#字符串模板" class="headerlink" title="字符串模板"></a>字符串模板</h6><blockquote>
+<p>$ 表示一个变量名或者变量值</p>
+<p>$varName 表示变量值</p>
+<p>${varName.fun()} 表示变量的方法返回值:</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span></span><br><span class="line"><span class="comment">// 模板中的简单名称：</span></span><br><span class="line"><span class="keyword">val</span> s1 = <span class="string">"a is <span class="variable">$a</span>"</span> </span><br><span class="line"></span><br><span class="line">a = <span class="number">2</span></span><br><span class="line"><span class="comment">// 模板中的任意表达式：</span></span><br><span class="line"><span class="keyword">val</span> s2 = <span class="string">"<span class="subst">$&#123;s1.replace(<span class="string">"is"</span>, <span class="string">"was"</span>)&#125;</span>, but now is <span class="variable">$a</span>"</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="NULL检查机制"><a href="#NULL检查机制" class="headerlink" title="NULL检查机制"></a>NULL检查机制</h6><blockquote>
+<p>Kotlin的空安全设计对于声明可为空的参数，在使用时要进行空判断处理，有两种处理方式</p>
+<ol>
+<li>字段后加!!像Java一样抛出空异常;</li>
+<li>字段后加?可不做处理返回值为 null或配合?:做空判断处理</li>
+</ol>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//类型后面加?表示可为空</span></span><br><span class="line"><span class="keyword">var</span> age: String? = <span class="string">"23"</span> </span><br><span class="line"><span class="comment">//抛出空指针异常</span></span><br><span class="line"><span class="keyword">val</span> ages = age!!.toInt()</span><br><span class="line"><span class="comment">//不做处理返回 null</span></span><br><span class="line"><span class="keyword">val</span> ages1 = age?.toInt()</span><br><span class="line"><span class="comment">//age为空返回-1</span></span><br><span class="line"><span class="keyword">val</span> ages2 = age?.toInt() ?: -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>当一个引用可能为 null 值时, 对应的类型声明必须明确地标记为可为 null。</p>
+</blockquote>
+<blockquote>
+<p>当 str 中的字符串内容不是一个整数时, 返回 null:</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">parseInt</span><span class="params">(str : <span class="type">String</span>)</span></span> : <span class="built_in">Int</span>?&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//在使用返回值可为null的函数的时候，必须先对返回值做判空操作</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">(args:<span class="type">Array</span>&lt;<span class="type">String</span>&gt;)</span></span>&#123;</span><br><span class="line">   <span class="keyword">val</span> x = parseInt(args[<span class="number">0</span>])</span><br><span class="line">   <span class="keyword">val</span> y = parseInt(args[<span class="number">1</span>])</span><br><span class="line">   <span class="keyword">if</span>(x != <span class="literal">null</span> &amp;&amp; y != <span class="literal">null</span>)&#123;</span><br><span class="line">       println(<span class="string">"x * y = <span class="subst">$&#123;x * y&#125;</span>"</span>)</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="类型检测以及自动类型转换"><a href="#类型检测以及自动类型转换" class="headerlink" title="类型检测以及自动类型转换"></a>类型检测以及自动类型转换</h6><blockquote>
+<p>使用<strong>is</strong> 或者<strong>!is</strong> 来检测一个表达式是或不是某类型的一个实例 </p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getStringLength</span><span class="params">(obj : <span class="type">Any</span>)</span></span> : <span class="built_in">Int</span>?&#123;</span><br><span class="line">    <span class="keyword">if</span>(obj <span class="keyword">is</span> String)&#123;</span><br><span class="line">        <span class="comment">//做过类型判断以后，obj会被系统自动转换成String类型</span></span><br><span class="line">        <span class="keyword">return</span> obj.length</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">      <span class="comment">//在这里还有一种方法，与Java中instanceof不同，使用!is</span></span><br><span class="line">      <span class="comment">// if (obj !is String)&#123;</span></span><br><span class="line">      <span class="comment">//   // XXX</span></span><br><span class="line">      <span class="comment">// &#125;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//这里的obj仍然是Any类型的引用</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getStringlength</span><span class="params">(obj : <span class="type">Any</span>)</span></span> : <span class="built_in">Int</span>?&#123;</span><br><span class="line">    <span class="keyword">if</span>(obj !<span class="keyword">is</span> String)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//在这个分支中，'obj'的类型会被自动转换成'String'</span></span><br><span class="line">    <span class="keyword">return</span> obj.length</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Kotlin基本数据类型"><a href="#Kotlin基本数据类型" class="headerlink" title="Kotlin基本数据类型"></a>Kotlin基本数据类型</h5><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>位宽度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Double</td>
+<td>64</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>64</td>
+</tr>
+<tr>
+<td>Int</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Short</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Byte</td>
+<td>8</td>
+</tr>
+</tbody></table>
+<h6 id="字面常量"><a href="#字面常量" class="headerlink" title="字面常量"></a>字面常量</h6><blockquote>
+<p>十进制：123</p>
+<p>长整型以大写的L结尾：123L</p>
+<p>16进制以<strong>0x</strong> 开头：0x0F</p>
+<p>2进制以<strong>0b</strong> 开头： 0b000101</p>
+<p><strong>不支持8进制</strong></p>
+</blockquote>
+<p>Kotlin支持传统符号表示的浮点数值</p>
+<blockquote>
+<ul>
+<li>Double默认写法：123.5，,13.5e10</li>
+<li>Float 使用f或者F后缀：123.5f</li>
+</ul>
+</blockquote>
+<p>可以使用<strong>下划线</strong> ，使得数字常量更加易读</p>
+<blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> creditCardNumber = <span class="number">1234_5678_9012_3456L</span></span><br><span class="line"><span class="keyword">val</span> socialSecurityNumber = <span class="number">999_99_9999L</span></span><br><span class="line"><span class="keyword">val</span> hexBytes = <span class="number">0xFF_EC_DE_5E</span></span><br><span class="line"><span class="keyword">val</span> bytes = <span class="number">0b11010010_01101001_10010100_10010010</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<h6 id="比较两个数字"><a href="#比较两个数字" class="headerlink" title="比较两个数字"></a>比较两个数字</h6><blockquote>
+<ul>
+<li><p>Kotlin 中没有基础数据类型，只有封装的数字类型，<strong>每定义的一个变量，其实 Kotlin 帮你封装了一个对象，这样可以保证不会出现空指针</strong>。</p>
+</li>
+<li><p>数字类型也一样，所有在比较两个数字的时候，就有比较数据大小和比较两个对象是否相同的区别了。</p>
+</li>
+</ul>
+</blockquote>
+<p>在Kotlin中</p>
+<blockquote>
+<p>===表示比较对象地址</p>
+<p>==表示比较两个值的大小</p>
+</blockquote>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">liubo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/Kotlin%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">https://github.com/liuclub/liuclub.github.io.git/2020/05/28/Kotlin%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="post-meta__tag-list"></div><nav id="pagination"><div class="next-post pull-right"><a href="/2020/05/28/13-%E5%B0%86Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8E%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8/"><span>13-将Kotlin协程与架构组件一起使用</span><i class="fa fa-chevron-right"></i></a></div></nav></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2013 - 2020 By liubo</div><div class="framework-info"><span>Driven - </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.7.0"></script><script src="/js/fancybox.js?version=1.7.0"></script><script src="/js/sidebar.js?version=1.7.0"></script><script src="/js/copy.js?version=1.7.0"></script><script src="/js/fireworks.js?version=1.7.0"></script><script src="/js/transition.js?version=1.7.0"></script><script src="/js/scroll.js?version=1.7.0"></script><script src="/js/head.js?version=1.7.0"></script><script>if(/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+  $('#top-container').addClass('is-mobile')
+}</script></body></html>
