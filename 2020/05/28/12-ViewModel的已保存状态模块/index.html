@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-tw,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="[TOC]  ViewModel 对象可以处理配置更改，因此您无需担心旋转时或其他情况下的状态。但是，如果您需要处理系统发起的进程终止，则可以使用 onSaveInstanceState() 作为备用方式。 界面状态通常在 ViewModel 对象中（而不是 Activity 中）存储或引用；因此，使用 onSaveInstanceState() 时需要该模块可以为您处理的某个样板。 模块设置好以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12-ViewModel的已保存状态模块">
+<meta property="og:url" content="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/12-ViewModel%E7%9A%84%E5%B7%B2%E4%BF%9D%E5%AD%98%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:site_name" content="凌晨三点的逗你玩">
+<meta property="og:description" content="[TOC]  ViewModel 对象可以处理配置更改，因此您无需担心旋转时或其他情况下的状态。但是，如果您需要处理系统发起的进程终止，则可以使用 onSaveInstanceState() 作为备用方式。 界面状态通常在 ViewModel 对象中（而不是 Activity 中）存储或引用；因此，使用 onSaveInstanceState() 时需要该模块可以为您处理的某个样板。 模块设置好以">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-05-28T11:52:46.000Z">
+<meta property="article:modified_time" content="2020-05-28T12:01:27.155Z">
+<meta property="article:author" content="liubo">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content=" Kotlin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/12-ViewModel%E7%9A%84%E5%B7%B2%E4%BF%9D%E5%AD%98%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>12-ViewModel的已保存状态模块 | 凌晨三点的逗你玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">凌晨三点的逗你玩</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/12-ViewModel%E7%9A%84%E5%B7%B2%E4%BF%9D%E5%AD%98%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liubo">
+      <meta itemprop="description" content="人最大的问题就是习惯自我辩解，但我们远比自己想象中更许巍、下作和幽暗。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凌晨三点的逗你玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          12-ViewModel的已保存状态模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-28 19:52:46 / Modified: 20:01:27" itemprop="dateCreated datePublished" datetime="2020-05-28T19:52:46+08:00">2020-05-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JetPack/" itemprop="url" rel="index"><span itemprop="name">JetPack</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<blockquote>
+<p><a href="https://developer.android.com/reference/androidx/lifecycle/ViewModel" target="_blank" rel="noopener"><code>ViewModel</code></a> 对象可以处理配置更改，因此您无需担心旋转时或其他情况下的状态。但是，如果您需要处理系统发起的进程终止，则可以使用 <a href="https://developer.android.com/reference/android/app/Activity#onSaveInstanceState(android.os.Bundle)" target="_blank" rel="noopener"><code>onSaveInstanceState()</code></a> 作为备用方式。</p>
+<p>界面状态通常在 <a href="https://developer.android.com/reference/androidx/lifecycle/ViewModel" target="_blank" rel="noopener"><code>ViewModel</code></a> 对象中（而不是 Activity 中）存储或引用；因此，使用 <a href="https://developer.android.com/reference/android/app/Activity#onSaveInstanceState(android.os.Bundle)" target="_blank" rel="noopener"><code>onSaveInstanceState()</code></a> 时需要该模块可以为您处理的某个样板。</p>
+<p>模块设置好以后，<a href="https://developer.android.com/reference/androidx/lifecycle/ViewModel" target="_blank" rel="noopener"><code>ViewModel</code></a> 对象会通过其构造函数接收 <a href="https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle" target="_blank" rel="noopener"><code>SavedStateHandle</code></a> 对象。这是一个键值对映射，用于向已保存状态写入对象以及从其中检索对象。这些值会在进程被系统终止后继续保留，并通过同一对象保持可用状态。</p>
+<p><strong>注意</strong>：状态必须是简单的轻量级状态。对于复杂或大型数据，您应该使用<a href="https://developer.android.com/topic/libraries/architecture/saving-states#use_local_persistence_to_handle_process_death_for_complex_or_large_data" target="_blank" rel="noopener">本地持久性存储</a>。</p>
+</blockquote>
+<h3 id="设置和使用"><a href="#设置和使用" class="headerlink" title="设置和使用"></a>设置和使用</h3><p>声明</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Saved state module for ViewModel</span></span><br><span class="line">implementation <span class="string">"androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"</span></span><br></pre></td></tr></table></figure>
+
+<p>设置 <a href="https://developer.android.com/reference/androidx/lifecycle/ViewModel" target="_blank" rel="noopener"><code>ViewModel</code></a> 来接收 SavedStateHandle，您需要使用可扩展 <a href="https://developer.android.com/reference/androidx/lifecycle/AbstractSavedStateVMFactory" target="_blank" rel="noopener"><code>AbstractSavedStateVMFactory</code></a> 的 Factory 来创建它们。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> vm = ViewModelProvider(<span class="keyword">this</span>, SavedStateVMFactory(<span class="keyword">this</span>))</span><br><span class="line">        .<span class="keyword">get</span>(SavedStateViewModel::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>之后，ViewModel 便可以有一个接收 SavedStateHandle 的构造函数：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SavedStateViewModel</span></span>(<span class="keyword">private</span> <span class="keyword">val</span> state: SavedStateHandle) : ViewModel() &#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="存储和检索值"><a href="#存储和检索值" class="headerlink" title="存储和检索值"></a>存储和检索值</h3><p><a href="https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle" target="_blank" rel="noopener"><code>SavedStateHandle</code></a> 类包含键值对映射应有的方法：</p>
+<ul>
+<li><code>get(String key)</code></li>
+<li><code>contains(String key)</code></li>
+<li><code>remove(String key)</code></li>
+<li><code>set(String key, T value)</code></li>
+<li><code>keys()</code></li>
+</ul>
+<p>此外，还有一种特殊的方法：<a href="https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle#getLiveData(java.lang.String)" target="_blank" rel="noopener"><code>getLiveData(String key)</code></a>，用于返回封装在 <a href="https://developer.android.com/reference/androidx/lifecycle/LiveData" target="_blank" rel="noopener"><code>LiveData</code></a> 可观察对象中的值。</p>
+<h3 id="可接受的类"><a href="#可接受的类" class="headerlink" title="可接受的类"></a>可接受的类</h3><table>
+<thead>
+<tr>
+<th align="left">类型/类</th>
+<th align="left">数组支持</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">double</td>
+<td align="left">double[]</td>
+</tr>
+<tr>
+<td align="left">int</td>
+<td align="left">int []</td>
+</tr>
+<tr>
+<td align="left">long</td>
+<td align="left">long []</td>
+</tr>
+<tr>
+<td align="left">String</td>
+<td align="left">String[]</td>
+</tr>
+<tr>
+<td align="left">byte</td>
+<td align="left">byte[]</td>
+</tr>
+<tr>
+<td align="left">char</td>
+<td align="left">char[]</td>
+</tr>
+<tr>
+<td align="left">CharSequence</td>
+<td align="left">CharSequence[]</td>
+</tr>
+<tr>
+<td align="left">float</td>
+<td align="left">float[]</td>
+</tr>
+<tr>
+<td align="left">Parcelable</td>
+<td align="left">Parcelable[]</td>
+</tr>
+<tr>
+<td align="left">Serializable</td>
+<td align="left">Serializable[]</td>
+</tr>
+<tr>
+<td align="left">short</td>
+<td align="left">short[]</td>
+</tr>
+<tr>
+<td align="left">SparseArray</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Binder</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Bundle</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">ArrayList</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Size (only in API 21+)</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">SizeF (only in API 21+)</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<h3 id="其他资源"><a href="#其他资源" class="headerlink" title="其他资源"></a>其他资源</h3><h4 id="Codelab"><a href="#Codelab" class="headerlink" title="Codelab"></a>Codelab</h4><p><a href="https://codelabs.developers.google.com/codelabs/android-lifecycles/#6" target="_blank" rel="noopener">Android 生命周期感知型组件 Codelab</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/28/11-%E4%BF%9D%E5%AD%98%E7%8A%B6%E6%80%81/" rel="prev" title="11-保存状态">
+      <i class="fa fa-chevron-left"></i> 11-保存状态
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/28/13-%E5%B0%86Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8E%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8/" rel="next" title="13-将Kotlin协程与架构组件一起使用">
+      13-将Kotlin协程与架构组件一起使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置和使用"><span class="nav-number">1.</span> <span class="nav-text">设置和使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储和检索值"><span class="nav-number">2.</span> <span class="nav-text">存储和检索值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可接受的类"><span class="nav-number">3.</span> <span class="nav-text">可接受的类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他资源"><span class="nav-number">4.</span> <span class="nav-text">其他资源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Codelab"><span class="nav-number">4.1.</span> <span class="nav-text">Codelab</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">liubo</p>
+  <div class="site-description" itemprop="description">人最大的问题就是习惯自我辩解，但我们远比自己想象中更许巍、下作和幽暗。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liubo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

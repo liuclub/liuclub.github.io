@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-tw,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="[TOC]  Kotlin 协程提供了一个可供您编写异步代码的 API。通过 Kotlin 协程，您可以定义 CoroutineScope，以帮助您管理何时应运行协程。每个异步操作都在特定范围内运行。  添加KTX依赖项本主题中介绍的内置协程范围包含在每个相应架构组件的 KTX 扩展程序中。请务必在使用这些范围时添加相应的依赖项。  对于 ViewModelScope，请使用 androidx.l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="13-将Kotlin协程与架构组件一起使用">
+<meta property="og:url" content="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/13-%E5%B0%86Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8E%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="凌晨三点的逗你玩">
+<meta property="og:description" content="[TOC]  Kotlin 协程提供了一个可供您编写异步代码的 API。通过 Kotlin 协程，您可以定义 CoroutineScope，以帮助您管理何时应运行协程。每个异步操作都在特定范围内运行。  添加KTX依赖项本主题中介绍的内置协程范围包含在每个相应架构组件的 KTX 扩展程序中。请务必在使用这些范围时添加相应的依赖项。  对于 ViewModelScope，请使用 androidx.l">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-05-28T11:53:08.000Z">
+<meta property="article:modified_time" content="2020-05-28T12:02:21.616Z">
+<meta property="article:author" content="liubo">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content=" Kotlin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/13-%E5%B0%86Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8E%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>13-将Kotlin协程与架构组件一起使用 | 凌晨三点的逗你玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">凌晨三点的逗你玩</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://github.com/liuclub/liuclub.github.io.git/2020/05/28/13-%E5%B0%86Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8E%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liubo">
+      <meta itemprop="description" content="人最大的问题就是习惯自我辩解，但我们远比自己想象中更许巍、下作和幽暗。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凌晨三点的逗你玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          13-将Kotlin协程与架构组件一起使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-28 19:53:08 / Modified: 20:02:21" itemprop="dateCreated datePublished" datetime="2020-05-28T19:53:08+08:00">2020-05-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JetPack/" itemprop="url" rel="index"><span itemprop="name">JetPack</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<blockquote>
+<p><a href="https://developer.android.com/kotlin/coroutines" target="_blank" rel="noopener">Kotlin 协程</a>提供了一个可供您编写异步代码的 API。通过 Kotlin 协程，您可以定义 <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/" target="_blank" rel="noopener"><code>CoroutineScope</code></a>，以帮助您管理何时应运行协程。每个异步操作都在特定范围内运行。</p>
+</blockquote>
+<h3 id="添加KTX依赖项"><a href="#添加KTX依赖项" class="headerlink" title="添加KTX依赖项"></a>添加KTX依赖项</h3><p>本主题中介绍的内置协程范围包含在每个相应架构组件的 <a href="https://developer.android.com/kotlin/ktx" target="_blank" rel="noopener">KTX 扩展程序</a>中。请务必在使用这些范围时添加相应的依赖项。</p>
+<ul>
+<li>对于 <a href="https://developer.android.com/topic/libraries/architecture/coroutines#viewmodelscope" target="_blank" rel="noopener"><code>ViewModelScope</code></a>，请使用 <code>androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0-beta01</code> 或更高版本。</li>
+<li>对于 <a href="https://developer.android.com/topic/libraries/architecture/coroutines#lifecyclescope" target="_blank" rel="noopener"><code>LifecycleScope</code></a>，请使用 <code>androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha01</code> 或更高版本。</li>
+<li>对于 <a href="https://developer.android.com/topic/libraries/architecture/coroutines#livedata" target="_blank" rel="noopener"><code>liveData</code></a>，请使用 <code>androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha01</code> 或更高版本。</li>
+</ul>
+<h3 id="生命周期感知型协程范围"><a href="#生命周期感知型协程范围" class="headerlink" title="生命周期感知型协程范围"></a>生命周期感知型协程范围</h3><h4 id="ViewModelScope"><a href="#ViewModelScope" class="headerlink" title="ViewModelScope"></a>ViewModelScope</h4><p>  为应用中的每个 <a href="https://developer.android.com/topic/libraries/architecture/viewmodel" target="_blank" rel="noopener"><code>ViewModel</code></a> 定义了 <code>ViewModelScope</code>。如果 <code>ViewModel</code> 已清除，则在此范围内启动的协程都会自动取消。如果您具有仅在 <code>ViewModel</code> 处于活动状态时才需要完成的工作，此时协程非常有用。</p>
+<blockquote>
+<p>例如，如果要为布局计算某些数据，则应将工作范围限定至 <code>ViewModel</code>，以便在 <code>ViewModel</code> 清除后，系统会自动取消工作以避免消耗资源。</p>
+</blockquote>
+<p>您可以通过 ViewModel 的 <code>viewModelScope</code> 属性访问 <code>ViewModel</code> 的 <code>CoroutineScope</code>，如以下示例所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyViewModel</span>: <span class="type">ViewModel</span></span>() &#123;</span><br><span class="line">        <span class="keyword">init</span> &#123;</span><br><span class="line">            viewModelScope.launch &#123;</span><br><span class="line">                <span class="comment">// Coroutine that will be canceled when the ViewModel is cleared.</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="LifecycleScope"><a href="#LifecycleScope" class="headerlink" title="LifecycleScope"></a>LifecycleScope</h4><p>  为每个 <a href="https://developer.android.com/topic/libraries/architecture/lifecycle" target="_blank" rel="noopener"><code>Lifecycle</code></a> 对象定义了 <code>LifecycleScope</code>。在此范围内启动的协程会在 <code>Lifecycle</code> 被销毁时取消。您可以通过 <code>lifecycle.coroutineScope</code> 或 <code>lifecycleOwner.lifecycleScope</code> 属性访问 <code>Lifecycle</code> 的 <code>CoroutineScope</code>。</p>
+<p>以下示例演示了如何使用 <code>lifecycleOwner.lifecycleScope</code> 异步创建预计算文本：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyFragment</span>: <span class="type">Fragment</span></span>() &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onViewCreated</span><span class="params">(view: <span class="type">View</span>, savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">            <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)</span><br><span class="line">            viewLifecycleOwner.lifecycleScope.launch &#123;</span><br><span class="line">                <span class="keyword">val</span> params = TextViewCompat.getTextMetricsParams(textView)</span><br><span class="line">                <span class="keyword">val</span> precomputedText = withContext(Dispatchers.Default) &#123;</span><br><span class="line">                    PrecomputedTextCompat.create(longTextContent, params)</span><br><span class="line">                &#125;</span><br><span class="line">                TextViewCompat.setPrecomputedText(textView, precomputedText)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="暂停生命周期感知型协程"><a href="#暂停生命周期感知型协程" class="headerlink" title="暂停生命周期感知型协程"></a>暂停生命周期感知型协程</h3><p>  即使 <code>CoroutineScope</code> 提供了适当的方法来自动取消长时间运行的操作，在某些情况下，您可能需要暂停执行代码块（除非 <code>Lifecycle</code> 处于特定状态）。例如，要运行 <code>FragmentTransaction</code>，您必须等到 <code>Lifecycle</code> 至少为 <code>STARTED</code>。对于这些情况，<code>Lifecycle</code> 提供了其他方法：<code>lifecycle.whenCreated</code>、<code>lifecycle.whenStarted</code> 和 <code>lifecycle.whenResumed</code>。如果 <code>Lifecycle</code> 未至少处于所需的最低状态，则会暂停在这些块内运行的任何协程。</p>
+<p>以下示例包含仅当关联的 <code>Lifecycle</code> 至少处于 <code>STARTED</code> 状态时才会运行的代码块：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyFragment</span>: <span class="type">Fragment &#123;</span></span></span><br><span class="line">        <span class="keyword">init</span> &#123; <span class="comment">// Notice that we can safely launch in the constructor of the Fragment.</span></span><br><span class="line">            lifecycleScope.launch &#123;</span><br><span class="line">                whenStarted &#123;</span><br><span class="line">                    <span class="comment">// The block inside will run only when Lifecycle is at least STARTED.</span></span><br><span class="line">                    <span class="comment">// It will start executing when fragment is started and</span></span><br><span class="line">                    <span class="comment">// can call other suspend methods.</span></span><br><span class="line">                    loadingView.visibility = View.VISIBLE</span><br><span class="line">                    <span class="keyword">val</span> canAccess = withContext(Dispatchers.IO) &#123;</span><br><span class="line">                        checkUserAccess()</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// When checkUserAccess returns, the next line is automatically</span></span><br><span class="line">                    <span class="comment">// suspended if the Lifecycle is not *at least* STARTED.</span></span><br><span class="line">                    <span class="comment">// We could safely run fragment transactions because we know the</span></span><br><span class="line">                    <span class="comment">// code won't run unless the lifecycle is at least STARTED.</span></span><br><span class="line">                    loadingView.visibility = View.GONE</span><br><span class="line">                    <span class="keyword">if</span> (canAccess == <span class="literal">false</span>) &#123;</span><br><span class="line">                        findNavController().popBackStack()</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        showContent()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// This line runs only after the whenStarted block above has completed.</span></span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>  如果在协程处于活动状态时通过某种 <code>when</code> 方法销毁了 <code>Lifecycle</code>，协程会自动取消。在以下示例中，一旦 <code>Lifecycle</code> 状态变为 <code>DESTROYED</code>，<code>finally</code> 块即会运行：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyFragment</span>: <span class="type">Fragment &#123;</span></span></span><br><span class="line">        <span class="keyword">init</span> &#123;</span><br><span class="line">            lifecycleScope.launchWhenStarted &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// Call some suspend functions.</span></span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    <span class="comment">// This line might execute after Lifecycle is DESTROYED.</span></span><br><span class="line">                    <span class="keyword">if</span> (lifecycle.state &gt;= STARTED) &#123;</span><br><span class="line">                        <span class="comment">// Here, since we've checked, it is safe to run any</span></span><br><span class="line">                        <span class="comment">// Fragment transactions.</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：尽管这些方法为使用 <code>Lifecycle</code> 提供了便利，但只有当信息在 <code>Lifecycle</code> 的范围（例如预计算文本）内有效时才应使用它们。请记住，协程不会随着 Activity 重启而重启。</p>
+</blockquote>
+<h3 id="将协程与LiveData一起使用"><a href="#将协程与LiveData一起使用" class="headerlink" title="将协程与LiveData一起使用"></a>将协程与LiveData一起使用</h3><p>  使用 <a href="https://developer.android.com/topic/libraries/architecture/livedata" target="_blank" rel="noopener"><code>LiveData</code></a> 时，您可能需要异步计算值。例如，您可能需要检索用户的偏好设置并将其传送给界面。在这些情况下，您可以使用 <code>liveData</code> 构建器函数调用 <code>suspend</code> 函数，并将结果作为 <code>LiveData</code> 对象传送。</p>
+<p>  在以下示例中，<code>loadUser()</code> 是在其他位置声明的暂停函数。使用 <code>liveData</code> 构建器函数异步调用 <code>loadUser()</code>，然后使用 <code>emit()</code> 发出结果：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> user: LiveData&lt;User&gt; = liveData &#123;</span><br><span class="line">        <span class="keyword">val</span> <span class="keyword">data</span> = database.loadUser() <span class="comment">// loadUser is a suspend function.</span></span><br><span class="line">        emit(<span class="keyword">data</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>  <code>liveData</code> 构建块用作协程和 <code>LiveData</code> 之间的<a href="https://medium.com/@elizarov/structured-concurrency-722d765aa952" target="_blank" rel="noopener">结构化并发基元</a>。</p>
+<ul>
+<li><p>当 <code>LiveData</code> 变为活动状态时，代码块开始执行；</p>
+</li>
+<li><p>当 <code>LiveData</code> 变为非活动状态时，代码块会在可配置的超时过后自动取消。</p>
+</li>
+</ul>
+<ul>
+<li><p>如果代码块在完成前取消，则会在 <code>LiveData</code> 再次变为活动状态后重启；</p>
+</li>
+<li><p>如果在上次运行中成功完成，则不会重启。</p>
+<p>请注意，代码块只有在自动取消的情况下才会重启。如果代码块由于任何其他原因（例如，抛出 <code>CancelationException</code>）而取消，则<strong>不会</strong>重启。</p>
+</li>
+</ul>
+<p>  还可以从代码块中发出多个值。每次 <code>emit()</code> 调用都会暂停执行代码块，直到在主线程上设置 <code>LiveData</code> 值。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> user: LiveData&lt;Result&gt; = liveData &#123;</span><br><span class="line">        emit(Result.loading())</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            emit(Result.success(fetchUser()))</span><br><span class="line">        &#125; <span class="keyword">catch</span>(ioException: Exception) &#123;</span><br><span class="line">            emit(Result.error(ioException))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>  也可以将 <code>liveData</code> 与 <a href="https://developer.android.com/reference/androidx/lifecycle/Transformations" target="_blank" rel="noopener"><code>Transformations</code></a> 结合使用，如以下示例所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyViewModel</span>: <span class="type">ViewModel</span></span>() &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">val</span> userId: LiveData&lt;String&gt; = MutableLiveData()</span><br><span class="line">        <span class="keyword">val</span> user = userId.switchMap &#123; id -&gt;</span><br><span class="line">            liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) &#123;</span><br><span class="line">                emit(database.loadUserById(id))</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>  可以从 <code>LiveData</code> 中发出多个值，方法是在每次想要发出新值时调用 <code>emitSource()</code> 函数。请注意，每次调用 <code>emit()</code> 或 <code>emitSource()</code> 都会移除之前添加的来源。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserDao</span>: <span class="type">Dao &#123;</span></span></span><br><span class="line">        <span class="meta">@Query(<span class="meta-string">"SELECT * FROM User WHERE id = :id"</span>)</span></span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">getUser</span><span class="params">(id: <span class="type">String</span>)</span></span>: LiveData&lt;User&gt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyRepository</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">getUser</span><span class="params">(id: <span class="type">String</span>)</span></span> = liveData&lt;User&gt; &#123;</span><br><span class="line">            <span class="keyword">val</span> disposable = emitSource(</span><br><span class="line">                userDao.getUser(id).map &#123;</span><br><span class="line">                    Result.loading(it)</span><br><span class="line">                &#125;</span><br><span class="line">            )</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">val</span> user = webservice.fetchUser(id)</span><br><span class="line">                <span class="comment">// Stop the previous emission to avoid dispatching the updated user</span></span><br><span class="line">                <span class="comment">// as `loading`.</span></span><br><span class="line">                disposable.dispose()</span><br><span class="line">                <span class="comment">// Update the database.</span></span><br><span class="line">                userDao.insert(user)</span><br><span class="line">                <span class="comment">// Re-establish the emission with success type.</span></span><br><span class="line">                emitSource(</span><br><span class="line">                    userDao.getUser(id).map &#123;</span><br><span class="line">                        Result.success(it)</span><br><span class="line">                    &#125;</span><br><span class="line">                )</span><br><span class="line">            &#125; <span class="keyword">catch</span>(exception: IOException) &#123;</span><br><span class="line">                <span class="comment">// Any call to `emit` disposes the previous one automatically so we don't</span></span><br><span class="line">                <span class="comment">// need to dispose it here as we didn't get an updated value.</span></span><br><span class="line">                emitSource(</span><br><span class="line">                    userDao.getUser(id).map &#123;</span><br><span class="line">                        Result.error(exception, it)</span><br><span class="line">                    &#125;</span><br><span class="line">                )</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如需更多与协程相关的信息，请参阅以下链接：</p>
+</blockquote>
+<ul>
+<li><a href="https://developer.android.com/kotlin/coroutines" target="_blank" rel="noopener">利用 Kotlin 协程提升应用性能</a></li>
+<li><a href="https://kotlinlang.org/docs/reference/coroutines-overview.html" target="_blank" rel="noopener">协程概览</a></li>
+<li><a href="https://developer.android.com/topic/libraries/architecture/workmanager/advanced/coroutineworker" target="_blank" rel="noopener">在 CoroutineWorker 中进行线程处理</a></li>
+</ul>
+<h3 id="其他资源"><a href="#其他资源" class="headerlink" title="其他资源"></a>其他资源</h3><h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p><a href="https://github.com/googlesamples/android-architecture-components/tree/master/LiveDataSample">Kotlin 协程与架构组件</a></p>
+<h4 id="博客"><a href="#博客" class="headerlink" title="博客"></a>博客</h4><ul>
+<li><a href="https://medium.com/androiddevelopers/coroutines-on-android-part-iii-real-work-2ba8a2ec2f45" target="_blank" rel="noopener">Android 上的协程：应用模式</a></li>
+<li><a href="https://medium.com/androiddevelopers/easy-coroutines-in-android-viewmodelscope-25bffb605471" target="_blank" rel="noopener">Android 中的简易协程：viewModelScope</a></li>
+<li><a href="https://medium.com/androiddevelopers/testing-two-consecutive-livedata-emissions-in-coroutines-5680b693cbf8" target="_blank" rel="noopener">在协程中测试两个连续的 LiveData 发出对象</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/28/12-ViewModel%E7%9A%84%E5%B7%B2%E4%BF%9D%E5%AD%98%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97/" rel="prev" title="12-ViewModel的已保存状态模块">
+      <i class="fa fa-chevron-left"></i> 12-ViewModel的已保存状态模块
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/28/Kotlin%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="Kotlin学习笔记">
+      Kotlin学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加KTX依赖项"><span class="nav-number">1.</span> <span class="nav-text">添加KTX依赖项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生命周期感知型协程范围"><span class="nav-number">2.</span> <span class="nav-text">生命周期感知型协程范围</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ViewModelScope"><span class="nav-number">2.1.</span> <span class="nav-text">ViewModelScope</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LifecycleScope"><span class="nav-number">2.2.</span> <span class="nav-text">LifecycleScope</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#暂停生命周期感知型协程"><span class="nav-number">3.</span> <span class="nav-text">暂停生命周期感知型协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将协程与LiveData一起使用"><span class="nav-number">4.</span> <span class="nav-text">将协程与LiveData一起使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他资源"><span class="nav-number">5.</span> <span class="nav-text">其他资源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例"><span class="nav-number">5.1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#博客"><span class="nav-number">5.2.</span> <span class="nav-text">博客</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">liubo</p>
+  <div class="site-description" itemprop="description">人最大的问题就是习惯自我辩解，但我们远比自己想象中更许巍、下作和幽暗。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liubo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
